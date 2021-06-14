@@ -1,0 +1,36 @@
+---
+# tasks file for install_gitlab_server
+
+- name: install packages
+  yum:
+    name: "{{ packages }}"
+    state: latest
+
+- name: start and enable ssh
+  service:
+    name: sshd
+    enabled: yes
+    state: started
+
+- name: allow http traffic
+  firewalld:
+    service: http
+    permanent: yes
+    state: enabled
+
+- name: reload firewall
+  service:
+    name: firewalld
+    state: reloaded
+    enabled: yes
+
+- name: install gitlab repository
+  shell: curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ee/script.rpm.sh | sudo bash
+
+- name: parsing gitlab version from backup
+  shell: ls /home/logan/backup_gitlab | cut -d "_" -f 5 | cut -d "-" -f 1
+  register: gitlab_version
+
+- name: install gitlab
+  shell: EXTERNAL_URL="http://{{hostvars.logan.ansible_host}}" yum install -y "gitlab-ee-{{ gitlab_version.stdout }}"
+

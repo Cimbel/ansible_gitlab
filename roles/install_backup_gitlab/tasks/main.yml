@@ -1,0 +1,12 @@
+---
+# tasks file for install_backup_gitlab
+
+- name: Install Git
+  yum:
+    name: git
+    state: latest
+
+- name: copy repository
+  shell: git clone "{{ gitlab_repo }}"
+  become: yes
+  become_user: logan

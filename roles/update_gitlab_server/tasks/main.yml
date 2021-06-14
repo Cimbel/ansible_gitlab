@@ -1,0 +1,11 @@
+---
+# tasks file for update_gitlab_server
+
+- name: install new version of gitlab server
+  yum:
+    name: gitlab-ee
+    state: latest
+  notify:
+    - Reconfig Gitlab
+    - Restart Gitlab
+    - Wait for establishing

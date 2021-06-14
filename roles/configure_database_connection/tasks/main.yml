@@ -1,0 +1,30 @@
+---
+# tasks file for configure_database_connection
+
+- name: configuring database connect
+  shell:
+    cmd: |
+      cat << EOF >> /etc/gitlab/gitlab.rb
+      #
+      #
+      # CONNECT EXTERANL DATABASE
+      #
+      # Disable the built-in Postgres
+      postgresql['enable'] = false
+      #
+      # Fill in the connection details for database.yml
+      gitlab_rails['db_adapter'] = 'postgresql'
+      gitlab_rails['db_encoding'] = 'utf8'
+      gitlab_rails['db_host'] = '{{ hostvars.romik.ansible_host }}'
+      gitlab_rails['db_port'] = 5432
+      gitlab_rails['db_username'] = '{{ gitlab_user }}'
+      gitlab_rails['db_password'] = '{{ gitlab_pass_db }}'
+
+- name: reconfigure gitlab
+  shell: gitlab-ctl reconfigure
+
+- name: restart gitlab
+  shell: gitlab-ctl restart
+
+- name: waiting for establishing all processes
+  shell: sleep 600

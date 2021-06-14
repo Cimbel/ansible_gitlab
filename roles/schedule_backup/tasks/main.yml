@@ -1,0 +1,34 @@
+---
+# tasks file for schedule_backup
+
+- name: set timezone
+  shell: timedatectl set-timezone "{{ timezone }}"
+
+- name: "delete previouses backups"
+  cron:
+    minute    : 50
+    hour      : 03
+    name      : "delete previouses backups"
+    cron_file : "delete-backups"
+    user      : "root"
+    job       : "rm -rf /var/opt/gitlab/backups/*"   
+
+- name: "add backup to schedule work"
+  cron:
+    minute    : 00
+    hour      : 04
+    name      : "backup-gitlab"
+    cron_file : "backup-gitlab"
+    user      : "root"
+    job       : "gitlab-backup create"
+
+- name: uniting files
+  shell: echo -e ">> delete-backups << \n\n$(cat /etc/cron.d/delete-backups) \n\n========\n\n>> backup-gitlab << $(cat /etc/cron.d/backup-gitlab)\n"
+  register: result
+
+- name: show result of unite
+  debug:
+    var: result.stdout_lines
+
+- name: reboot server after 1 minute
+  shell: shutdown -r 1

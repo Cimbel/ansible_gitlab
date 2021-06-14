@@ -1,0 +1,11 @@
+---
+# handlers file for update_gitlab_server
+
+- name: Reconfig Gitlab
+  shell: gitlab-ctl reconfigure
+
+- name: Restart Gitlab
+  shell: gitlab-ctl restart
+
+- name: Wait for establishing
+  shell: sleep 600

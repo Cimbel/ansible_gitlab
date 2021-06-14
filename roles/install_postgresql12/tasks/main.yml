@@ -1,0 +1,27 @@
+---
+# tasks file for install_postgresql12
+
+- name: install repository for postgresql12
+  yum:
+    name: https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+    state: latest
+
+- name: install postgresql12-server
+  yum:
+    name: postgresql12-server
+    state: latest
+
+- name: install additional library
+  yum:
+    name: postgresql12-contrib
+    state: latest
+
+- name: init-db
+  shell: /usr/pgsql-12/bin/postgresql-12-setup initdb
+  ignore_errors: yes
+
+- name: enable and start postgresql
+  service:
+    name: postgresql-12
+    state: started
+    enabled: yes

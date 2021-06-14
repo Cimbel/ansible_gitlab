@@ -1,0 +1,27 @@
+---
+# tasks file for restore_gitlab_from_backup
+
+- name: copy backup to the right place
+  shell: cp /home/logan/backup_gitlab/* /var/opt/gitlab/backups
+
+- name: stop puma
+  shell: gitlab-ctl stop puma
+
+- name: stop sidekiq
+  shell: gitlab-ctl stop sidekiq
+
+- name: parsing name of backup
+  shell: ls /var/opt/gitlab/backups | cut -d "_" -f 1-5
+  register: backup_version
+
+- name: backuping
+  shell: GITLAB_ASSUME_YES=1 gitlab-backup restore BACKUP="{{backup_version.stdout}}"
+
+- name: reconfigure gitlab
+  shell: gitlab-ctl reconfigure
+
+- name: restart gitlab
+  shell: gitlab-ctl restart
+
+- name: wait for establishing
+  shell: sleep 600

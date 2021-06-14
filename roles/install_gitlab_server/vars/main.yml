@@ -1,0 +1,8 @@
+---
+# vars file for install_gitlab_server
+
+packages:
+  - curl
+  - policycoreutils-python
+  - openssh-server
+  - perl

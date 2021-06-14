@@ -1,0 +1,37 @@
+---
+# tasks file for configure_database
+- name: create user
+  shell: sudo -u postgres psql -d template1 -c "CREATE USER git SUPERUSER CREATEDB LOGIN ENCRYPTED PASSWORD 'admin4000';"
+
+- name: create database
+  shell: sudo -u postgres psql -d template1 -c "CREATE DATABASE {{ gitlab_database }} OWNER {{ gitlab_user }};"
+
+- name: add first extension
+  shell: sudo -u postgres psql -d "{{ gitlab_database }}" -c "CREATE EXTENSION btree_gist;"
+
+- name: add last extension
+  shell: sudo -u postgres psql -d "{{ gitlab_database }}" -c "CREATE EXTENSION pg_trgm;"
+
+- name: change pg_hba.conf
+  shell: echo "host {{ gitlab_database }} {{ gitlab_user }} {{ hostvars.logan.ansible_host }}/24 md5" >> /var/lib/pgsql/12/data/pg_hba.conf
+
+- name: change postgresql.conf
+  shell: echo "listen_addresses = '*'" >> /var/lib/pgsql/12/data/postgresql.conf
+
+- name: restart database
+  service:
+    name: postgresql-12
+    enabled: yes
+    state: restarted
+
+- name: allow port
+  firewalld:
+    port: 5432/tcp
+    state: enabled
+    permanent: yes
+
+- name: reload firewall
+  service:
+    name: firewalld
+    state: reloaded
+

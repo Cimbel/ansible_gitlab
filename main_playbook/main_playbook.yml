@@ -1,0 +1,21 @@
+---
+- name: install database
+  hosts: gitlab_db
+  become: yes
+
+  roles:
+    - install_postgresql12
+    - configure_database
+
+- name: install and restore from backup gitlab server
+  hosts: gitlab_server
+  become: yes
+
+  roles:
+    - install_backup_gitlab
+    - install_gitlab_server
+    - configure_database_connection
+    - restore_gitlab_from_backup
+    - update_gitlab_server
+    - schedule_backup
+
