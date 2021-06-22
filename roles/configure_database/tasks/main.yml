@@ -1,7 +1,7 @@
 ---
 # tasks file for configure_database
 - name: create user
-  shell: sudo -u postgres psql -d template1 -c "CREATE USER git SUPERUSER CREATEDB LOGIN ENCRYPTED PASSWORD 'admin4000';"
+  shell: sudo -u postgres psql -d template1 -c "CREATE USER {{ gitlab_user }} SUPERUSER CREATEDB LOGIN ENCRYPTED PASSWORD '{{ gitlab_pass_db }}';"
 
 - name: create database
   shell: sudo -u postgres psql -d template1 -c "CREATE DATABASE {{ gitlab_database }} OWNER {{ gitlab_user }};"
